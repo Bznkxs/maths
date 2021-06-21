@@ -30,17 +30,35 @@ from scipy.stats import ttest_ind, f
 from scipy.stats import chi2_contingency  # chi2_contingency to perform chi2 independence test
 
 
-def test(target_distribution, statistic, *other_values):
-    a_r = target_distribution.pdf(statistic, *other_values)
+def test(target_distribution, statistic, kind='two-sided', *other_values):  # returns a p-value
+    a_r = target_distribution.cdf(statistic, *other_values)
     a_l = target_distribution.sf(statistic, *other_values)
 
+    if kind == 'less':
+        if a_r < a_l:
+            return a_r
+        return 1 - a_l
+    if kind == 'greater':
+        if a_r < a_l:
+            return 1 - a_r
+        return a_l
+    # two-sided
+    if a_r < a_l:
+        return a_r * 2
+    return a_l * 2
 
 def p3():
-    x = [14.6,14.7,15.1,14.9,14.8,15.0,15.1,15.2,14.8]
-    y = [15.2,15.1,15.4,14.9,15.3,15.0,15.2,14.8,15.7,15.0]
+    x = np.array([14.6,14.7,15.1,14.9,14.8,15.0,15.1,15.2,14.8])
+    y = np.array([15.2,15.1,15.4,14.9,15.3,15.0,15.2,14.8,15.7,15.0])
     ee = stats.levene(x, y)
+    s12 = sample_std(x) ** 2
+    s22 = sample_std(y) ** 2
+    print(ttest_1samp(x, 14.8, alternative='two-sided'))
+    t_statistic = (x.mean() - 14.8) * np.sqrt(len(x)) / (sample_std(x))
+    print(test(stats.t, t_statistic, 'two-sided', len(x)-1))
 
-    print(ee)
+    e2 = test(f, s12 / s22, 'equal', len(x) - 1, len(y) - 1)
+    print(ee, e2)
     a = ttest_ind(x, y, equal_var=True)
     b = ttest_ind(x, y, equal_var=True, alternative='less')
     c = ttest_ind(x, y, equal_var=True, alternative='greater')
