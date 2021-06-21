@@ -345,3 +345,154 @@ $$
 
 
 
+## 13. 回归分析
+
+### 回归模型（数学知识）
+
+线性回归模型：假设因变量$y$与若干自变量$\{x_i\}_1^n$之间有关系
+$$
+y=\beta_0+\sum_{i=1}^n\beta_ix_i+\varepsilon
+$$
+其中，$\varepsilon$是一个独立于其他变量的随机变量，称为随机误差，满足$\varepsilon\sim N(0, \sigma^2)$。
+
+#### 一维线性回归模型的性质
+
+1. 独立性（对于多个样本$(x_i, y_i)$，$x_i$互相独立，$y_i$也互相独立）
+2. 线性性：期望是线性的
+3. 齐次性：对不同的$x$，$y$方差为常数
+4. 正态性：对相同的$x$，$y$服从正态分布
+
+#### 方差估计
+
+当根据一些样本数据，拟合出方程
+$$
+\hat{y}=\hat{\beta}_0+\hat{\beta}_1x
+$$
+
+##### 平方和公式
+
+总偏差平方和=回归平方和+残差平方和
+$$
+\sum(y_i-\bar{y})^2=\sum(\hat{y}_i-\bar{y})^2+\sum(y_i-\hat{y}_i)^2\\
+S=U+Q
+$$
+
+##### 决定系数
+
+$$
+R^2=U/S
+$$
+
+##### 参数分布
+
+令$s_{xx}=\sum(x_i-\bar{x})^2.$
+$$
+\hat{\beta}_1\sim N\left(\beta_1,\frac{\sigma^2}{s_{xx}}\right),\\
+\hat{\beta}_0\sim N\left(\beta_0,\sigma^2\left(\frac{1}{n}+\frac{\bar{x}^2}{s_{xx}}\right)\right)
+$$
+
+由此可得
+$$
+Q/\sigma^2\sim\chi^2(n-2).
+$$
+
+令剩余方差
+$$
+s^2=\frac{Q}{n-2}
+$$
+作为方差的估计值。
+
+#### 显著性检验，t检验和区间估计
+
+显著性检验：检验参数是否为0。因为如果为0，模型就失去意义了。
+
+当$H_0:\beta_1=0$时，
+$$
+U/\sigma^2\sim\chi^2(1),
+$$
+##### $F$检验
+
+$$
+F=\frac{U}{Q/(n-2)}\sim F(1, n-2)
+$$
+##### $t$检验
+
+令
+$$
+S_{\beta_0}^2=\left(\frac{1}{n}+\frac{\bar{x}^2}{s_{xx}}\right)\frac{Q}{n-2},\\
+S_{\beta_1}^2=\frac{Q}{(n-2)s_{xx}},
+$$
+则当$H_0:\beta_0=0$，
+
+$$
+\hat\beta_0/S_{\beta_0}\sim t(n-2)
+$$
+
+
+当$H_0:\beta_1=0$，
+$$
+\hat\beta_1/S_{\beta_1}\sim t(n-2)
+$$
+一般地：令
+$$
+t=\frac{\hat\beta_1\sqrt{s_{xx}}}{s}\sim t(n-2)
+$$
+
+
+若上述关于$\beta_1$的检验的$p$值小于一定的数（例如0.05），就认为模型显著。
+
+##### 区间估计
+
+$$
+\beta_0:[\hat\beta_0-t_{1-\alpha/2}(n-2)S_{\beta_0},\hat\beta_0+t_{1-\alpha/2}(n-2)S_{\beta_0}]\\
+\beta_1:[\hat\beta_1-t_{1-\alpha/2}(n-2)S_{\beta_1}, \hat\beta_1+t_{1-\alpha/2}(n-2)S_{\beta_1}]
+$$
+
+#### 预测
+
+若对于$x_0$求得预测值$\hat y_0$，那么
+$$
+T=\frac{y_0-\hat{y_0}}{\sqrt{\frac{Q}{n-2}}\sqrt{\frac{(x_0-\bar{x})^2}{s_{xx}}+\frac{1}{n}+1}}\sim t(n-2)
+$$
+预测区间为
+$$
+\left[\hat{y_0}-t_{1-\alpha/2}(n-2)s\sqrt{\frac{(x_0-\bar{x})^2}{s_{xx}}+\frac{1}{n}+1}, \hat{y_0}+t_{1-\alpha/2}(n-2)s\sqrt{\frac{(x_0-\bar{x})^2}{s_{xx}}+\frac{1}{n}+1}\right]
+$$
+
+
+当接近$\bar{x}$且$n$大时，可以近似：
+$$
+\left[\hat{y_0}-u_{1-\alpha/2}s,\hat{y_0}+u_{1-\alpha/2}s\right]
+$$
+
+#### 总结
+
+![image-20210621104225934](regression01.png)
+
+![image-20210621105730171](regression01_2.png)
+
+![image-20210621105322454](regression02.png)
+
+![image-20210621105410214](regression03.png)
+
+#### 交互作用
+
+利用残差分析，也即考察$y-\hat y$是否为$N(0,\sigma^2)$
+
+### 对照表
+
+sm.OLS(y,x).fit()具有如下功能。
+
+| 量/功能           | Statsmodel                    | 说明                |
+| ----------------- | ----------------------------- | ------------------- |
+| $s^2$             | `mse_resid`                   | `summary2`里的scale |
+| df                | `df_resid`                    | =N-M-1              |
+| Q                 | `sum(resid**2)`               | $s^2$=Q/df          |
+| $\beta_i$         | `params`                      | `coef` in `summary` |
+| $F$和$P_{>F}$     | `fvalue`, `f_pvalue`          | summary有           |
+| $t$和$P$          | `tvalues`                     | 看`summary`         |
+| $\beta$的置信区间 | 根据t自己算<br/>见代码analyze | `summary(alpha)`    |
+| s_xx或c_jj        | `normalized_cov_params`       | 对角元素            |
+| 预测              | `predict([x0,x1,..])`         | `x0`需为1           |
+| 预测区间          |                               |                     |
+
