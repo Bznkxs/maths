@@ -25,8 +25,26 @@ def interval(x: np.ndarray, alpha, sigma=None):
 
 from scipy.stats import ttest_1samp  # t-test
 
+from scipy.stats import ttest_ind, f
 
 from scipy.stats import chi2_contingency  # chi2_contingency to perform chi2 independence test
+
+
+def test(target_distribution, statistic, *other_values):
+    a_r = target_distribution.pdf(statistic, *other_values)
+    a_l = target_distribution.sf(statistic, *other_values)
+
+
+def p3():
+    x = [14.6,14.7,15.1,14.9,14.8,15.0,15.1,15.2,14.8]
+    y = [15.2,15.1,15.4,14.9,15.3,15.0,15.2,14.8,15.7,15.0]
+    ee = stats.levene(x, y)
+
+    print(ee)
+    a = ttest_ind(x, y, equal_var=True)
+    b = ttest_ind(x, y, equal_var=True, alternative='less')
+    c = ttest_ind(x, y, equal_var=True, alternative='greater')
+    print(a,b,c)
 
 
 if __name__ == '__main__':
@@ -34,3 +52,4 @@ if __name__ == '__main__':
     interval(a, 0.05)  # do an interval hypothesis
     d = np.array([[1,3,2],[2,1,1]])
     print(chi2_contingency(d))  # statistic; p-value; degrees of freedom; expected values
+    p3()
