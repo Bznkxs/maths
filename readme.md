@@ -483,16 +483,17 @@ $$
 
 sm.OLS(y,x).fit()具有如下功能。
 
-| 量/功能           | Statsmodel                    | 说明                |
-| ----------------- | ----------------------------- | ------------------- |
-| $s^2$             | `mse_resid`                   | `summary2`里的scale |
-| df                | `df_resid`                    | =N-M-1              |
-| Q                 | `sum(resid**2)`               | $s^2$=Q/df          |
-| $\beta_i$         | `params`                      | `coef` in `summary` |
-| $F$和$P_{>F}$     | `fvalue`, `f_pvalue`          | summary有           |
-| $t$和$P$          | `tvalues`                     | 看`summary`         |
-| $\beta$的置信区间 | 根据t自己算<br/>见代码analyze | `summary(alpha)`    |
-| s_xx或c_jj        | `normalized_cov_params`       | 对角元素            |
-| 预测              | `predict([x0,x1,..])`         | `x0`需为1           |
-| 预测区间          |                               |                     |
+| 量/功能           | Statsmodel                    | 说明                                 |
+| ----------------- | ----------------------------- | ------------------------------------ |
+| $s^2$             | `mse_resid`                   | `summary2`里的scale；<br/>注意开根号 |
+| N                 | `nobs`                        | number of observation                |
+| df                | `df_resid`                    | =N-M-1                               |
+| Q                 | `sum(resid**2)`               | $s^2$=Q/df                           |
+| $\beta_i$         | `params`                      | `coef` in `summary`                  |
+| $F$和$P_{>F}$     | `fvalue`, `f_pvalue`          | summary有                            |
+| $t$和$P$          | `tvalues`                     | 看`summary`                          |
+| $\beta$的置信区间 | 根据t自己算<br/>见代码analyze | `summary(alpha)`                     |
+| s_xx或c_jj        | `normalized_cov_params`       | 对角元素                             |
+| 预测              | `predict([x0,x1,..])`         | `x0`需为1                            |
+| 预测区间          | 自己算<br/>见代码predict      |                                      |
 
