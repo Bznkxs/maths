@@ -24,9 +24,10 @@ def analyze(*x, y):
     ts = est2.tvalues
     t = scipy.stats.t.ppf(1-alpha/2, est2.df_resid)
     Sb = b / ts
-    lefts = b - t * Sb  # calculate trust interval of b by hand
+    lefts = b - t * Sb  # calculate trust interval of b by hand; equals corresponding values in summary
     rights = b + t * Sb
     return est2, xc
+
 
 def predict(avgx, est2, *pred_x, alpha=0.05):
     pred_x = [1] + list(pred_x)
